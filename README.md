@@ -1,3 +1,39 @@
+# Our bot: playing it against another bot
+
+The bot is finished: `agent.py` wires in the strategy from `brain.py`, `fasteval.py` and `data/preflop_eq.npy`.
+
+**Setup (once):** `pip install -r requirements-dev.txt numpy`
+
+**Play against a teammate's bot**: open three terminals in this folder.
+
+1. Start our bot (port 5008):
+   ```
+   python agent.py
+   ```
+2. Start the other bot on port 5009. Put their `agent.py` (and any files it imports) in a separate folder, then run it there:
+   ```
+   $env:PORT=5009; python agent.py        # Windows PowerShell
+   PORT=5009 python agent.py              # macOS / Linux
+   ```
+3. Run the judge:
+   ```
+   python judge_engine.py --agent1 http://127.0.0.1:5008 --agent2 http://127.0.0.1:5009
+   ```
+   Use the `http://127.0.0.1:...` form. On Windows, plain port numbers can fail to connect.
+
+**Reading the result**
+- `RESULT: AGENT1_WIN` means our bot won, `AGENT2_WIN` means theirs did, and `CHOP` is a draw (the edge wasn't statistically significant).
+- Try a few card seeds (`--seed 2`, `--seed 3`, ...) before drawing conclusions.
+- Check the **Faults** lines: errors or `TIME BANK EMPTY` on either side can decide a match.
+- To study a loss, save every hand with `--json out.json --logs`.
+
+**Other tests**
+- `python -m pytest -q test_agent.py`: official checks that the tournament can run the bot.
+- `bash dev/judge_all.sh`: official judge against all 4 baseline bots.
+- `python dev/sim.py 1000 5`: fast local gauntlet against 10 sparring bots.
+
+---
+
 # Short Deck PLO5 Bot Tournament: Participant Bundle
 
 Your bot is **one file, `agent.py`**. It is a complete FastAPI HTTP web server. You edit one marked section, and the tournament runs the file as-is.
